@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Mail, 
@@ -9,10 +9,7 @@ import {
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
-  CornerDownLeft,
-  Users,
-  GraduationCap,
-  Sparkles
+  CornerDownLeft
 } from 'lucide-react';
 
 export default function Contact() {
@@ -216,7 +213,6 @@ export default function Contact() {
                         </label>
                         <input
                           type="text"
-                          autoFocus
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
@@ -268,7 +264,6 @@ export default function Contact() {
                         </label>
                         <input
                           type="tel"
-                          autoFocus
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && handleNext()}
@@ -288,7 +283,6 @@ export default function Contact() {
                         </label>
                         <textarea
                           rows={3}
-                          autoFocus
                           required
                           value={query}
                           onChange={(e) => setQuery(e.target.value)}

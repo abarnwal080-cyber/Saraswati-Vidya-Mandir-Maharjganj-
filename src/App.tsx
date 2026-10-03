@@ -41,10 +41,14 @@ export default function App() {
   // Search input state
   const [searchVal, setSearchVal] = useState('');
 
-  // Force Light Mode completely (removing dark class)
+  // Force Light Mode completely & scroll to top on mount
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('dark');
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
 
   // Search result mapping helper
