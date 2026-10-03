@@ -9,7 +9,8 @@ import {
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
-  CornerDownLeft
+  CornerDownLeft,
+  MessageCircle
 } from 'lucide-react';
 
 export default function Contact() {
@@ -26,6 +27,11 @@ export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('');
 
   const progressPercentage = Math.round((step / totalSteps) * 100);
+
+  const getWhatsAppUrl = () => {
+    const text = `Namaste! New Inquiry from SVM Maharajganj Website:\n\n*Name:* ${name}\n*Role:* ${role}\n*Phone:* ${phone || 'Not provided'}\n*Query/Message:* ${query}\n\nSchool: Saraswati Vidya Mandir, Maharajganj (CBSE: 330263)`;
+    return `https://wa.me/917209325453?text=${encodeURIComponent(text)}`;
+  };
 
   const handleNext = () => {
     setErrorMsg('');
@@ -55,7 +61,10 @@ export default function Contact() {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 800);
+      // Auto-redirect to WhatsApp number 7209325453
+      const waUrl = getWhatsAppUrl();
+      window.location.href = waUrl;
+    }, 600);
   };
 
   const handleReset = () => {
@@ -125,7 +134,7 @@ export default function Contact() {
                 <div>
                   <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">ADMIN HELPLINE</span>
                   <p className="text-xs md:text-sm text-slate-800 font-semibold mt-1 font-mono">
-                    +91 94314 26738 / +91 99342 11094
+                    +91 94314 26738 / +91 7209325453
                   </p>
                 </div>
               </div>
@@ -182,17 +191,27 @@ export default function Contact() {
                       <CheckCircle2 className="h-8 w-8" />
                     </div>
                     <h4 className="font-display font-black text-xl text-slate-900 mb-1">
-                      Inquiry Logged Successfully!
+                      Redirecting to WhatsApp...
                     </h4>
                     <p className="text-xs text-slate-600 max-w-sm mx-auto mb-4">
-                      Thank you, <strong>{name}</strong>. Our school admissions team will respond via phone or email (<span className="font-mono">svmmrj1@gmail.com</span>).
+                      Thank you, <strong>{name}</strong>! Your inquiry details are being forwarded directly to WhatsApp (+91 7209325453).
                     </p>
-                    <button
-                      onClick={handleReset}
-                      className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
-                    >
-                      Submit Another Query
-                    </button>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <a
+                        href={getWhatsAppUrl()}
+                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-2"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Open WhatsApp Chat Now</span>
+                      </a>
+                      <button
+                        onClick={handleReset}
+                        className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                      >
+                        Submit Another Query
+                      </button>
+                    </div>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -324,7 +343,7 @@ export default function Contact() {
                 >
                   {step === totalSteps ? (
                     <>
-                      <span>{isSubmitting ? 'Submitting...' : 'Submit Inquiry'}</span>
+                      <span>{isSubmitting ? 'Submitting...' : 'Send on WhatsApp'}</span>
                       <Send className="h-3.5 w-3.5" />
                     </>
                   ) : (

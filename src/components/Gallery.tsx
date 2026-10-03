@@ -17,7 +17,7 @@ import {
 const galleryImages = [
   {
     id: 1,
-    url: 'https://i.ibb.co/twyfGhX5/Chat-GPT-Image-May-22-2026-10-12-04-AM.png',
+    url: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlhddPW61gbkX1JtgatSpeZ01Z9n1cnZ89j3dB0fKhjnJG7m_LtuI30SEfkWKi1Bw4pimLime4NGU_gMbQRn2OjTCING1-EJDPa_bK1oKfpHIsJ-zf5ZSek50LYMhDH6OUcI3RlVCVHlrl3=s1360-w1360-h1020-rw',
     title: 'School Campus',
     category: 'Campus'
   },
