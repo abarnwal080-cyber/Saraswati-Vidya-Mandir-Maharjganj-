@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronUp, Facebook, Twitter, Youtube, Linkedin, Send, Mail, CheckCircle2, Award, Heart, Sparkles } from 'lucide-react';
+import { ChevronUp, Send, CheckCircle2, Sparkles } from 'lucide-react';
 import { navItems } from '../data';
 
 export default function Footer() {
@@ -14,8 +14,7 @@ export default function Footer() {
     setTimeout(() => {
       setNewsEmail('');
       setSubscribed(false);
-      alert('Subscribed successfully to Saraswati Vidya Mandir circulars!');
-    }, 2000);
+    }, 2500);
   };
 
   const handleScrollToTop = () => {
@@ -63,7 +62,7 @@ export default function Footer() {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed font-sans max-w-sm mt-2">
-              Combining standardized state CBSE frameworks with Vedic mathematics, classical moral teachings, and complete physical health routines under Vidya Bharati leadership.
+              Combining standardized CBSE frameworks with Vedic values, classical moral teachings, and complete physical and intellectual growth under Vidya Bharati leadership.
             </p>
 
             <div className="flex items-center gap-2.5 mt-2">
@@ -114,7 +113,7 @@ export default function Footer() {
               DIGITAL DISPATCH & CONTACT
             </h3>
             <p className="text-xs text-slate-400 leading-normal">
-              Official school helpline & notices. For admissions and payments: <span className="text-white font-mono font-bold">svmmrj1@gmail.com</span>
+              Official school helpline & notices. For admissions and inquiries: <span className="text-white font-mono font-bold">svmmrj1@gmail.com</span>
             </p>
 
             <div className="relative mt-2">
@@ -146,50 +145,10 @@ export default function Footer() {
                     className="p-3 bg-green-500/10 border border-green-500/20 text-green-400 text-xs rounded-xl flex items-center gap-2"
                   >
                     <CheckCircle2 className="h-4 w-4 shrink-0" />
-                    <span>Subscribed successfully!</span>
+                    <span>Subscribed to circulars successfully!</span>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-
-            {/* Social Icons */}
-            <div className="flex items-center gap-3.5 mt-3">
-              <a 
-                href="https://facebook.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="p-2 bg-slate-900 hover:bg-blue-600 hover:text-white rounded-xl border border-slate-800 transition-all shadow-md"
-                aria-label="Facebook Profile"
-              >
-                <Facebook className="h-4 w-4" />
-              </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="p-2 bg-slate-900 hover:bg-blue-400 hover:text-white rounded-xl border border-slate-800 transition-all shadow-md"
-                aria-label="Twitter Profile"
-              >
-                <Twitter className="h-4 w-4" />
-              </a>
-              <a 
-                href="https://youtube.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="p-2 bg-slate-900 hover:bg-red-600 hover:text-white rounded-xl border border-slate-800 transition-all shadow-md"
-                aria-label="YouTube Channel"
-              >
-                <Youtube className="h-4 w-4" />
-              </a>
-              <a 
-                href="https://linkedin.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="p-2 bg-slate-900 hover:bg-blue-700 hover:text-white rounded-xl border border-slate-800 transition-all shadow-md"
-                aria-label="LinkedIn Profile"
-              >
-                <Linkedin className="h-4 w-4" />
-              </a>
             </div>
           </div>
 

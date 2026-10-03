@@ -30,7 +30,6 @@ import Teachers from './components/Teachers';
 import CBSEAffiliation from './components/CBSEAffiliation';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import Chatbot from './components/Chatbot';
 import PremiumLoader from './components/PremiumLoader';
 import FloatingContact from './components/FloatingContact';
 
@@ -126,9 +125,6 @@ export default function App() {
 
       {/* Floating Left Contact Us & Quick Enquiry Button */}
       <FloatingContact />
-
-      {/* Full-Screen Pop-Up AI Chatbot Desk */}
-      <Chatbot />
 
       {/* MODAL 1: Live Search Dialog */}
       <AnimatePresence>
