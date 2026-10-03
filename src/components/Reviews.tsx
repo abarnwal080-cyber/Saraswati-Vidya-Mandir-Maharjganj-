@@ -110,28 +110,25 @@ export default function Reviews() {
       <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500/10 rounded-full filter blur-[100px] pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-72 h-72 bg-orange-500/10 rounded-full filter blur-[100px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Left Column: Testimonials Glass Slider Card */}
-          <div className="lg:col-span-6 flex flex-col justify-center">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 text-xs font-bold tracking-wider uppercase mb-5 self-start shadow-sm"
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-              Trusted Community Testimonials
-            </motion.div>
+      <div className="max-w-4xl mx-auto relative z-10">
+        <div className="flex flex-col justify-center">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 text-xs font-bold tracking-wider uppercase mb-5 self-center shadow-sm"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>Trusted Community Testimonials</span>
+          </motion.div>
 
-            <h2 className="font-display font-black text-3xl md:text-5xl tracking-tight text-slate-900 leading-tight mb-4">
-              Real Experiences from Our <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Grateful Families</span>
-            </h2>
+          <h2 className="font-display font-black text-3xl md:text-5xl tracking-tight text-slate-900 leading-tight mb-4 text-center">
+            Real Experiences from Our <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Grateful Families</span>
+          </h2>
 
-            <p className="text-slate-600 text-xs md:text-sm font-medium mb-8 max-w-lg">
-              Hear directly from parents, students, and alumni about the intellectual, moral, and cultural growth at Saraswati Vidya Mandir Maharajganj.
-            </p>
+          <p className="text-slate-600 text-xs md:text-sm font-medium mb-8 max-w-xl mx-auto text-center">
+            Hear directly from parents, students, and alumni about the intellectual, moral, and cultural growth at Saraswati Vidya Mandir Maharajganj.
+          </p>
 
             {/* Testimonials Glass Slider Card */}
             {activeReview && (
@@ -219,31 +216,7 @@ export default function Reviews() {
             </div>
           </div>
 
-          {/* Right Column: Campus Showcase Banner */}
-          <div className="lg:col-span-6 flex flex-col gap-4">
-            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200 group">
-              <img 
-                src="https://5.imimg.com/data5/SELLER/Default/2025/3/497435984/QI/OC/EQ/199130833/computer-laboratory-service-500x500.jpg"
-                alt="SVM Computer Lab & Classrooms"
-                className="w-full h-80 md:h-[380px] object-cover group-hover:scale-105 transition-transform duration-700"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex flex-col justify-end p-8">
-                <span className="text-xs font-mono font-bold text-amber-300 uppercase tracking-widest">
-                  SVM Maharajganj Legacy
-                </span>
-                <h3 className="font-display font-black text-2xl text-white mt-1">
-                  Holistic Education & Moral Values
-                </h3>
-                <p className="text-xs text-slate-200 mt-2 max-w-md leading-relaxed">
-                  Join hundreds of parents who trust Saraswati Vidya Mandir for high academic rigor and traditional Bharatiya culture.
-                </p>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </div>
 
       {/* Write a Review Modal */}
       <AnimatePresence>

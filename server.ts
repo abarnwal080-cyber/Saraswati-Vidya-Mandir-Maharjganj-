@@ -114,13 +114,14 @@ Always uphold Indian cultural ethos ("Namaste 🙏", "Pranam", "Jai Hind"). You 
   - Aruna (Social Science Teacher - 9570898684)
   - Usha Kumari (Social Science Teacher - 9155501258)
   - Meena Kumari (Social Science Teacher)
+  - Vibha Singh (Social Science Teacher)
 
 • Sanskrit Department:
-  - Niraj Jee (Acharya - Sanskrit Teacher, Acharya, M.A. Sanskrit, B.Ed.)
   - Satyam Tiwari (Sanskrit Teacher - 9123201838)
   - Alok Ranjan Prabhat (Sanskrit Teacher - 9470480369)
 
 • Mathematics Department:
+  - Ankit Ji (Maths Teacher)
   - Gautam Sharma (Maths Teacher - 8084820851)
   - Hariom Kumar (Maths Specialist - 9199111822)
   - Pradyuman Kumar Mishra (Chemistry + Maths Teacher - 9006397662)
@@ -143,8 +144,6 @@ Always uphold Indian cultural ethos ("Namaste 🙏", "Pranam", "Jai Hind"). You 
   - Seema Ray (English Teacher - 9060533578)
 
 • Science Department:
-  - Pradeep Kumar Dubey (Physics Teacher - 7254848247)
-  - Vibha Didi Jee (Science Teacher, B.Sc., B.Ed.)
   - Garima Didi Jee (Science Teacher, B.Sc., B.Ed.)
   - Nipu Kumari Sinha (Science Teacher - 8083279788)
   - Manoj Kumar Raj (Physics Teacher - 9504187252)
@@ -249,10 +248,10 @@ app.post("/api/chat", async (req, res) => {
         responseText = "Sristy Kumari (D/O Mr. Vinod Kumar Varnawal) achieved 97.2% and holds the prestigious Class VIII Outstanding Honor & School Champion title at Saraswati Vidya Mandir Maharajganj.";
       } else if (lower.includes("topper") || lower.includes("glory") || lower.includes("result") || lower.includes("shashikant") || lower.includes("jaywardhan") || lower.includes("priyaranjan")) {
         responseText = "Our CBSE Class 10 Board Toppers:\n• Shashikant: 98% (Rank #1)\n• Jaywardhan: 96.8% (Rank #2)\n• Priyaranjan Raj: 95.6% (Rank #3)\n\nSpecial Class VIII Honor: Sristy Kumari (97.2%).";
-      } else if (lower.includes("dinesh") || lower.includes("social science")) {
-        responseText = "Dinesh Ji is our Senior Social Science Teacher (M.A. History/Pol. Science, B.Ed.) at Saraswati Vidya Mandir Maharajganj.";
-      } else if (lower.includes("niraj") || lower.includes("sanskrit")) {
-        responseText = "Niraj Jee is our Acharya & Senior Sanskrit Teacher (Acharya, M.A. Sanskrit, B.Ed.) at Saraswati Vidya Mandir Maharajganj.";
+      } else if (lower.includes("dinesh") || lower.includes("social science") || lower.includes("vibha")) {
+        responseText = "Dinesh Ji is our Senior Social Science Teacher (M.A. History/Pol. Science, B.Ed.), and Vibha Singh also serves in the Social Science faculty at Saraswati Vidya Mandir Maharajganj.";
+      } else if (lower.includes("ankit") || lower.includes("maths") || lower.includes("mathematics")) {
+        responseText = "Ankit Ji and Gautam Sharma are our Mathematics teachers at Saraswati Vidya Mandir Maharajganj.";
       } else if (lower.includes("principal") || lower.includes("tiwari")) {
         responseText = "Our respected Principal is Shri Shambhu Sharan Tiwari (M.A., B.Ed.), bringing over 35 years of educational experience and values-based leadership.";
       } else {

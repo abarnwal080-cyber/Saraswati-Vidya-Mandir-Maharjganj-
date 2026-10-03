@@ -27,6 +27,17 @@ const iconMap: { [key: string]: any } = {
   HeartHandshake: HeartHandshake,
 };
 
+const amenityGradients = [
+  { gradient: 'from-blue-600 to-indigo-600', shadow: 'shadow-blue-500/25', bg: 'hover:border-blue-300' },
+  { gradient: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25', bg: 'hover:border-amber-300' },
+  { gradient: 'from-cyan-500 to-teal-600', shadow: 'shadow-teal-500/25', bg: 'hover:border-teal-300' },
+  { gradient: 'from-purple-600 to-violet-600', shadow: 'shadow-purple-500/25', bg: 'hover:border-purple-300' },
+  { gradient: 'from-emerald-500 to-green-600', shadow: 'shadow-emerald-500/25', bg: 'hover:border-emerald-300' },
+  { gradient: 'from-rose-500 to-pink-600', shadow: 'shadow-rose-500/25', bg: 'hover:border-rose-300' },
+  { gradient: 'from-indigo-600 to-sky-600', shadow: 'shadow-indigo-500/25', bg: 'hover:border-indigo-300' },
+  { gradient: 'from-fuchsia-600 to-pink-600', shadow: 'shadow-fuchsia-500/25', bg: 'hover:border-fuchsia-300' },
+];
+
 export default function About() {
   return (
     <section 
@@ -141,23 +152,24 @@ export default function About() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" id="feature-grid-panel">
               {featureCards.map((card, index) => {
                 const IconComponent = iconMap[card.icon] || GraduationCap;
+                const theme = amenityGradients[index % amenityGradients.length];
                 return (
                   <motion.div
                     key={index}
                     whileHover={{ y: -4, scale: 1.01 }}
                     viewport={{ once: true }}
-                    className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-blue-400/50 hover:shadow-md transition-all duration-300"
+                    className={`p-4 md:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-300 ${theme.bg}`}
                     id={`feature-card-${index}`}
                   >
-                    <div className="flex items-center gap-3.5 mb-3">
-                      <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
-                        <IconComponent className="h-5 w-5" />
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`p-2.5 rounded-xl bg-gradient-to-tr ${theme.gradient} text-white shadow-md ${theme.shadow} shrink-0`}>
+                        <IconComponent className="h-4.5 w-4.5" />
                       </div>
                       <h4 className="font-display font-extrabold text-sm md:text-base text-slate-900 tracking-tight">
                         {card.title}
                       </h4>
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed font-sans">
+                    <p className="text-xs text-slate-600 leading-relaxed font-sans pl-0.5">
                       {card.description}
                     </p>
                   </motion.div>

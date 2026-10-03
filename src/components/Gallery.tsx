@@ -1,371 +1,368 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Sparkles, 
-  BookOpen, 
-  GraduationCap, 
-  Star, 
+  Images, 
   ChevronLeft, 
   ChevronRight, 
   X, 
   Maximize2, 
-  Heart,
-  Pencil,
-  Smile
+  Heart, 
+  ArrowRight, 
+  ArrowLeft, 
+  Download, 
+  Camera,
+  Home
 } from 'lucide-react';
+import { schoolGalleryPhotos, SchoolPhotoItem } from '../data';
 
-const galleryImages = [
-  {
-    id: 1,
-    url: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlhddPW61gbkX1JtgatSpeZ01Z9n1cnZ89j3dB0fKhjnJG7m_LtuI30SEfkWKi1Bw4pimLime4NGU_gMbQRn2OjTCING1-EJDPa_bK1oKfpHIsJ-zf5ZSek50LYMhDH6OUcI3RlVCVHlrl3=s1360-w1360-h1020-rw',
-    title: 'School Campus',
-    category: 'Campus'
-  },
-  {
-    id: 2,
-    url: 'https://www.21kschool.com/in/wp-content/uploads/sites/4/2024/08/What-is-a-Smart-Classroom-The-Complete-Overview.png',
-    title: 'Smart Classroom',
-    category: 'Smart Learning'
-  },
-  {
-    id: 3,
-    url: 'https://5.imimg.com/data5/SELLER/Default/2025/3/497435984/QI/OC/EQ/199130833/computer-laboratory-service-500x500.jpg',
-    title: 'Computer Laboratory',
-    category: 'IT Lab'
-  },
-  {
-    id: 4,
-    url: 'https://i.ibb.co/TMTNxb5c/IMG-20260522-181830.jpg',
-    title: 'Students & Activities',
-    category: 'Activities'
-  }
-];
+interface GalleryProps {
+  isSubpage?: boolean;
+  onOpenSubpage?: () => void;
+  onBackToHome?: () => void;
+}
 
-export default function Gallery() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
-  const [lightboxTitle, setLightboxTitle] = useState<string>('');
-  const [isAutoplay, setIsAutoplay] = useState(true);
-  const [likedImages, setLikedImages] = useState<Record<number, boolean>>({});
+export default function Gallery({ 
+  isSubpage = false, 
+  onOpenSubpage, 
+  onBackToHome 
+}: GalleryProps) {
+  // Lightbox State
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [likedPhotos, setLikedPhotos] = useState<Record<number, number>>({});
+  const [userLikes, setUserLikes] = useState<Record<number, boolean>>({});
 
-  // 3D Tilt Hover States
-  const [tiltAngle, setTiltAngle] = useState({ x: 0, y: 0 });
-  const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-
-  // Auto-slide every 1.5 seconds (1500ms)
-  useEffect(() => {
-    if (!isAutoplay) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [isAutoplay]);
-
-  // Keyboard navigation
+  // Keyboard navigation for Lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === null) return;
       if (e.key === 'ArrowLeft') {
-        handlePrev();
+        handlePrevLightbox();
       } else if (e.key === 'ArrowRight') {
-        handleNext();
+        handleNextLightbox();
       } else if (e.key === 'Escape') {
-        setLightboxImage(null);
+        setLightboxIndex(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [lightboxIndex]);
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
   };
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  const handleNextLightbox = () => {
+    if (lightboxIndex === null) return;
+    setLightboxIndex((prev) => (prev! + 1) % schoolGalleryPhotos.length);
+  };
+
+  const handlePrevLightbox = () => {
+    if (lightboxIndex === null) return;
+    setLightboxIndex((prev) => (prev! - 1 + schoolGalleryPhotos.length) % schoolGalleryPhotos.length);
   };
 
   const toggleLike = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setLikedImages((prev) => ({ ...prev, [id]: !prev[id] }));
+    const isLiked = userLikes[id];
+    setUserLikes((prev) => ({ ...prev, [id]: !isLiked }));
+    setLikedPhotos((prev) => ({
+      ...prev,
+      [id]: (prev[id] || 0) + (isLiked ? -1 : 1)
+    }));
   };
 
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>, id: number) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Calculate 3D tilt coordinates
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
+  const activeLightboxPhoto: SchoolPhotoItem | null = 
+    lightboxIndex !== null ? schoolGalleryPhotos[lightboxIndex] : null;
 
-    setTiltAngle({ x: rotateX, y: rotateY });
-    setCursorPos({ x, y });
-    setHoveredCardId(id);
-  };
+  /* =========================================================================
+      1. HOMEPAGE VIEW: JUST ONE CLEAN TAB UNDER OUR GLORY
+  ========================================================================= */
+  if (!isSubpage) {
+    return (
+      <section 
+        id="gallery" 
+        className="relative py-16 px-4 md:px-10 bg-slate-50 overflow-hidden scroll-mt-10"
+      >
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-blue-100/30 rounded-full filter blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-100/30 rounded-full filter blur-[100px] pointer-events-none" />
 
-  const handleCardMouseLeave = () => {
-    setTiltAngle({ x: 0, y: 0 });
-    setHoveredCardId(null);
-  };
+        <div className="max-w-3xl mx-auto relative z-10">
+          <div className="p-8 md:p-12 rounded-3xl bg-white border border-slate-200 shadow-lg relative overflow-hidden flex flex-col items-center text-center">
+            {/* Decorative background glow */}
+            <div className="absolute -top-20 -right-20 w-52 h-52 bg-gradient-to-br from-blue-400/15 via-teal-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-52 h-52 bg-gradient-to-tr from-amber-400/15 via-orange-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
 
-  return (
-    <section 
-      id="gallery" 
-      className="relative py-20 px-4 md:px-10 bg-gradient-to-b from-white via-sky-50/30 to-amber-50/20 overflow-hidden"
-    >
-      {/* Soft Pastel Background Blobs */}
-      <div className="absolute top-10 left-10 w-80 h-80 bg-gradient-to-tr from-pink-200/40 to-orange-200/30 rounded-full filter blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-tr from-blue-200/40 to-teal-200/30 rounded-full filter blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-gradient-to-tr from-yellow-200/30 to-rose-200/20 rounded-full filter blur-[90px] pointer-events-none" />
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 text-xs font-bold tracking-wider uppercase mb-4 shadow-xs">
+              <Camera className="h-3.5 w-3.5 text-blue-600" />
+              <span>Photo Gallery</span>
+            </div>
 
-      {/* Floating Decorative Elements */}
-      <div className="absolute top-16 left-[8%] animate-bounce duration-[4s] opacity-70 pointer-events-none">
-        <Sparkles className="h-7 w-7 text-amber-400 filter drop-shadow-sm" />
-      </div>
-      <div className="absolute top-36 right-[8%] animate-[spin_10s_infinite] opacity-60 pointer-events-none">
-        <GraduationCap className="h-8 w-8 text-blue-500 filter drop-shadow-sm" />
-      </div>
-      <div className="absolute bottom-20 left-[10%] animate-[pulse_3s_infinite] opacity-70 pointer-events-none">
-        <BookOpen className="h-7 w-7 text-teal-500 filter drop-shadow-sm" />
-      </div>
-      <div className="absolute bottom-32 right-[10%] animate-bounce duration-[5s] opacity-60 pointer-events-none">
-        <Pencil className="h-6 w-6 text-orange-400 filter drop-shadow-sm" />
-      </div>
-      <div className="absolute top-[60%] right-[4%] animate-[pulse_4s_infinite] opacity-60 pointer-events-none">
-        <Star className="h-5 w-5 text-pink-400 fill-pink-300/40" />
-      </div>
-      <div className="absolute top-[40%] left-[4%] animate-bounce duration-[3s] opacity-50 pointer-events-none">
-        <Smile className="h-6 w-6 text-emerald-500" />
-      </div>
+            {/* Heading */}
+            <h3 className="font-display font-black text-2xl md:text-4xl tracking-tight text-slate-900 mb-3">
+              School <span className="bg-gradient-to-r from-blue-600 via-teal-500 to-amber-500 bg-clip-text text-transparent">Photo Gallery</span>
+            </h3>
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        
-        {/* Section Heading */}
-        <div className="text-center mb-10">
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 border border-orange-200 text-orange-600 text-xs font-bold tracking-wider uppercase mb-3 shadow-sm"
-          >
-            <span role="img" aria-label="camera" className="text-sm">📸</span>
-            School Gallery
-          </motion.div>
-          
-          <h2 className="font-display font-black text-3xl md:text-4xl tracking-tight text-slate-900">
-            Every Moment <span className="bg-gradient-to-r from-orange-500 via-rose-500 to-blue-600 bg-clip-text text-transparent">Tells a Story</span>
-          </h2>
-        </div>
+            <p className="text-slate-600 text-xs md:text-sm max-w-lg mb-8 font-medium leading-relaxed">
+              Explore {schoolGalleryPhotos.length} numbered archival campus moments and celebrations of Saraswati Vidya Mandir Maharajganj.
+            </p>
 
-        {/* Clean Carousel Container */}
-        <div 
-          className="max-w-3xl mx-auto relative"
-          onMouseEnter={() => setIsAutoplay(false)}
-          onMouseLeave={() => setIsAutoplay(true)}
-          id="premium-school-carousel"
-        >
-          {/* Main Showcase Slide Frame */}
-          <div className="relative p-3 sm:p-5 bg-white border border-slate-200/80 rounded-3xl shadow-[0_20px_50px_rgba(15,23,42,0.08)] transition-all duration-300 overflow-hidden">
-            
-            {/* Animated Border Gradient Line */}
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-400 via-pink-500 to-blue-500" />
-
-            {/* Inner Content Carousel Image */}
-            <div className="relative rounded-2xl overflow-hidden aspect-[16/10] bg-slate-100 border border-slate-100 shadow-sm group">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentIndex}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="absolute inset-0 cursor-pointer"
-                  onClick={() => {
-                    setLightboxImage(galleryImages[currentIndex].url);
-                    setLightboxTitle(galleryImages[currentIndex].title);
-                  }}
-                  onMouseMove={(e) => handleCardMouseMove(e, galleryImages[currentIndex].id)}
-                  onMouseLeave={handleCardMouseLeave}
-                  style={{
-                    perspective: 1000,
-                    transform: hoveredCardId === galleryImages[currentIndex].id
-                      ? `rotateX(${tiltAngle.x}deg) rotateY(${tiltAngle.y}deg) scale(1.01)`
-                      : 'rotateX(0deg) rotateY(0deg) scale(1)',
-                    transition: hoveredCardId === galleryImages[currentIndex].id ? 'none' : 'all 0.4s ease-out'
-                  }}
+            {/* Thumbnail Preview Stack */}
+            <div className="flex items-center justify-center -space-x-3 mb-8">
+              {schoolGalleryPhotos.slice(0, 5).map((photo) => (
+                <div 
+                  key={photo.id}
+                  className="w-12 h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden border-2 border-white shadow-md relative group shrink-0"
                 >
-                  {/* Image */}
                   <img 
-                    src={galleryImages[currentIndex].url} 
-                    alt={galleryImages[currentIndex].title} 
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
+                    src={photo.url} 
+                    alt={`Photo #${photo.id}`} 
+                    className="w-full h-full object-cover" 
                     referrerPolicy="no-referrer"
                   />
-
-                  {/* Gentle shimmer */}
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-transparent via-white/15 to-transparent translate-x-[-100%] group-hover:animate-[shimmer_2s_infinite]" />
-
-                  {/* Top Right Quick Actions */}
-                  <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={(e) => toggleLike(galleryImages[currentIndex].id, e)}
-                      className="p-2 rounded-full bg-white/70 hover:bg-white backdrop-blur-md border border-white/60 text-slate-700 shadow-sm transition-colors"
-                      id="like-gallery-btn"
-                    >
-                      <Heart 
-                        className={`h-4 w-4 transition-colors ${
-                          likedImages[galleryImages[currentIndex].id] 
-                            ? 'text-rose-500 fill-rose-500' 
-                            : 'text-slate-700'
-                        }`} 
-                      />
-                    </motion.button>
-
-                    <button
-                      className="p-2 rounded-full bg-white/70 hover:bg-white backdrop-blur-md border border-white/60 text-slate-700 shadow-sm transition-colors"
-                      aria-label="Zoom Image"
-                    >
-                      <Maximize2 className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  {/* Category Badge at top-left */}
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold tracking-wide text-white bg-slate-900/70 backdrop-blur-md shadow-sm">
-                      {galleryImages[currentIndex].category}
-                    </span>
-                  </div>
-
-                  {/* Gradient bottom overlay for caption readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
-                  
-                  {/* Inside image title for clean look */}
-                  <div className="absolute bottom-3 left-4 right-4 z-10">
-                    <h3 className="text-white font-display font-extrabold text-lg md:text-xl drop-shadow-md">
-                      {galleryImages[currentIndex].title}
-                    </h3>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Slider Left and Right Controls */}
-              <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-20">
-                <button 
-                  onClick={handlePrev}
-                  className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md backdrop-blur-md border border-white pointer-events-auto transition-transform hover:scale-105"
-                  aria-label="Previous Slide"
-                  id="gallery-slider-prev"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-
-                <button 
-                  onClick={handleNext}
-                  className="p-2 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md backdrop-blur-md border border-white pointer-events-auto transition-transform hover:scale-105"
-                  aria-label="Next Slide"
-                  id="gallery-slider-next"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-
-            </div>
-
-            {/* Bottom Minimal Dots Navigation */}
-            <div className="mt-4 flex items-center justify-center gap-2">
-              {galleryImages.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    currentIndex === idx 
-                      ? 'w-6 bg-orange-500' 
-                      : 'w-2 bg-slate-200 hover:bg-slate-300'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
+                </div>
               ))}
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-teal-500 border-2 border-white shadow-md flex items-center justify-center text-white font-mono font-bold text-xs shrink-0">
+                +27
+              </div>
             </div>
 
+            {/* THE "OPEN GALLERY" ACTION BUTTON */}
+            <button
+              onClick={onOpenSubpage}
+              id="open-gallery-btn"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-display font-extrabold text-sm md:text-base rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-3 cursor-pointer group"
+            >
+              <Images className="h-5 w-5 text-white group-hover:rotate-6 transition-transform" />
+              <span>Open Gallery</span>
+              <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-xs font-mono">
+                {schoolGalleryPhotos.length} Photos
+              </span>
+              <ArrowRight className="h-4 w-4 text-white group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* =========================================================================
+      2. DEDICATED SUBPAGE VIEW: FULL STANDALONE PAGE (HORIZONTALLY 2-2 IMAGES)
+  ========================================================================= */
+  return (
+    <div className="min-h-screen pt-24 pb-20 px-4 md:px-10 bg-slate-50">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Subpage Sticky Header with Breadcrumb & Back to Home */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 md:p-8 shadow-md mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
+              <button 
+                onClick={onBackToHome}
+                className="hover:text-blue-600 flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <Home className="h-3.5 w-3.5" />
+                <span>Home</span>
+              </button>
+              <span>/</span>
+              <span className="text-blue-600 font-bold">Photo Gallery Subpage</span>
+            </div>
+
+            <h1 className="font-display font-black text-2xl md:text-4xl text-slate-900 tracking-tight flex items-center gap-3">
+              <span>School Photo Gallery</span>
+              <span className="text-xs px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-mono font-bold border border-blue-200">
+                {schoolGalleryPhotos.length} Photos
+              </span>
+            </h1>
+            <p className="text-xs md:text-sm text-slate-500 mt-1">
+              Complete photographic records • Click any image to view in high definition
+            </p>
           </div>
 
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBackToHome}
+              className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs md:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+              id="subpage-back-home-btn"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Home</span>
+            </button>
+          </div>
+        </div>
+
+        {/* HORIZONTALLY 2-2 IMAGES (grid-cols-2) WITH JUST IMAGE & NUMBERING */}
+        <div className="grid grid-cols-2 gap-3 md:gap-6">
+          {schoolGalleryPhotos.map((photo, index) => (
+            <motion.div
+              key={photo.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: Math.min(index * 0.02, 0.3) }}
+              whileHover={{ y: -3 }}
+              className="group relative rounded-2xl md:rounded-3xl overflow-hidden bg-slate-100 border-2 border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => openLightbox(index)}
+            >
+              {/* Image Container */}
+              <div className="aspect-[4/3] md:aspect-[16/11] w-full overflow-hidden relative">
+                <img 
+                  src={photo.url} 
+                  alt={`Photo #${photo.id}`}
+                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+
+                {/* Numbering Badge Only */}
+                <div className="absolute top-2.5 left-2.5 md:top-3.5 md:left-3.5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-xl bg-slate-950/85 backdrop-blur-md text-amber-300 border border-white/20 text-xs md:text-sm font-mono font-black shadow-lg flex items-center gap-1.5 z-10">
+                  <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>#{photo.id < 10 ? `0${photo.id}` : photo.id}</span>
+                </div>
+
+                {/* Hover icon */}
+                <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <div className="p-2.5 rounded-full bg-white/90 text-slate-900 shadow-lg transform scale-75 group-hover:scale-100 transition-transform">
+                    <Maximize2 className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Bottom Back Button */}
+        <div className="mt-12 text-center">
+          <button
+            onClick={onBackToHome}
+            className="px-8 py-3.5 rounded-full bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-600 font-bold text-sm shadow-sm hover:shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Return to Home Page</span>
+          </button>
         </div>
 
       </div>
 
-      {/* Lightbox Modal */}
+      {/* =========================================================================
+          LIGHTBOX MODAL FOR FULL RESOLUTION VIEWER
+      ========================================================================= */}
       <AnimatePresence>
-        {lightboxImage && (
-          <motion.div 
+        {activeLightboxPhoto && (
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
-            id="gallery-lightbox"
+            className="fixed inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex items-center justify-center p-3 md:p-8"
+            onClick={() => setLightboxIndex(null)}
+            id="gallery-lightbox-modal"
           >
-            {/* Close button */}
-            <button 
-              onClick={() => setLightboxImage(null)}
-              className="absolute top-5 right-5 p-2.5 bg-white/20 hover:bg-white/30 text-white rounded-full transition-all"
-              aria-label="Close Lightbox"
-              id="lightbox-close-btn"
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25 }}
+              className="relative max-w-5xl w-full max-h-[92vh] bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="h-6 w-6" />
-            </button>
+              {/* Lightbox Header Bar - Clean Numbering Only */}
+              <div className="p-4 px-6 bg-slate-950 flex items-center justify-between border-b border-slate-800 text-white z-10">
+                <div className="flex items-center gap-3">
+                  <span className="px-3.5 py-1.5 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 font-mono font-bold text-sm">
+                    #{activeLightboxPhoto.id < 10 ? `0${activeLightboxPhoto.id}` : activeLightboxPhoto.id}
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">
+                    Photo {lightboxIndex! + 1} of {schoolGalleryPhotos.length}
+                  </span>
+                </div>
 
-            {/* Previous */}
-            <button 
-              onClick={() => {
-                const prevIdx = (galleryImages.findIndex(img => img.url === lightboxImage) - 1 + galleryImages.length) % galleryImages.length;
-                setLightboxImage(galleryImages[prevIdx].url);
-                setLightboxTitle(galleryImages[prevIdx].title);
-              }}
-              className="absolute left-4 md:left-8 p-3 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors z-10"
-              aria-label="Previous Image"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => toggleLike(activeLightboxPhoto.id, e)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      userLikes[activeLightboxPhoto.id]
+                        ? 'bg-rose-500 text-white'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    }`}
+                  >
+                    <Heart className={`h-3.5 w-3.5 ${userLikes[activeLightboxPhoto.id] ? 'fill-current' : ''}`} />
+                    <span>{likedPhotos[activeLightboxPhoto.id] || 0}</span>
+                  </button>
 
-            {/* Image display */}
-            <div className="max-w-4xl w-full flex flex-col items-center justify-center">
-              <motion.img 
-                key={lightboxImage}
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                src={lightboxImage} 
-                alt={lightboxTitle} 
-                className="max-h-[75vh] w-auto max-w-full object-contain rounded-2xl shadow-2xl border border-white/20"
-                referrerPolicy="no-referrer"
-              />
-              <div className="mt-4 text-center">
-                <h3 className="text-white font-display font-bold text-xl">
-                  {lightboxTitle}
-                </h3>
+                  <a
+                    href={activeLightboxPhoto.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                    title="Open image"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+
+                  <button
+                    onClick={() => setLightboxIndex(null)}
+                    className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors cursor-pointer"
+                    title="Close"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Next */}
-            <button 
-              onClick={() => {
-                const nextIdx = (galleryImages.findIndex(img => img.url === lightboxImage) + 1) % galleryImages.length;
-                setLightboxImage(galleryImages[nextIdx].url);
-                setLightboxTitle(galleryImages[nextIdx].title);
-              }}
-              className="absolute right-4 md:right-8 p-3 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors z-10"
-              aria-label="Next Image"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
+              {/* Lightbox Main Image Display */}
+              <div className="relative flex-1 bg-black/95 flex items-center justify-center overflow-hidden min-h-[300px] max-h-[72vh] p-2">
+                <img 
+                  src={activeLightboxPhoto.url} 
+                  alt={`Photo #${activeLightboxPhoto.id}`}
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                  referrerPolicy="no-referrer"
+                />
+
+                {/* Previous / Next Floating Arrows */}
+                <button
+                  onClick={handlePrevLightbox}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-2xl bg-slate-900/80 hover:bg-slate-900 text-white border border-white/20 backdrop-blur-md transition-all hover:scale-110 cursor-pointer shadow-lg"
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+
+                <button
+                  onClick={handleNextLightbox}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-2xl bg-slate-900/80 hover:bg-slate-900 text-white border border-white/20 backdrop-blur-md transition-all hover:scale-110 cursor-pointer shadow-lg"
+                  aria-label="Next photo"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Lightbox Footer Thumbnail Scroller */}
+              <div className="p-3 bg-slate-950 flex items-center gap-2 overflow-x-auto border-t border-slate-800">
+                {schoolGalleryPhotos.map((p, idx) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setLightboxIndex(idx)}
+                    className={`relative shrink-0 w-12 h-10 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                      lightboxIndex === idx
+                        ? 'border-amber-400 scale-105 opacity-100 shadow-sm shadow-amber-400/30'
+                        : 'border-transparent opacity-40 hover:opacity-80'
+                    }`}
+                  >
+                    <img 
+                      src={p.url} 
+                      alt={`Photo #${p.id}`} 
+                      className="w-full h-full object-cover" 
+                      referrerPolicy="no-referrer"
+                    />
+                    <span className="absolute bottom-0 inset-x-0 bg-black/85 text-[8px] font-mono text-center text-white py-0.2">
+                      #{p.id < 10 ? `0${p.id}` : p.id}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </div>
   );
 }

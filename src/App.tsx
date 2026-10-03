@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, 
@@ -18,6 +18,7 @@ import {
 import Navbar from './components/Navbar';
 import Marquee from './components/Marquee';
 import Hero from './components/Hero';
+import StoryCarousel from './components/StoryCarousel';
 import About from './components/About';
 import Gallery from './components/Gallery';
 import Principal from './components/Principal';
@@ -33,12 +34,35 @@ import Footer from './components/Footer';
 import PremiumLoader from './components/PremiumLoader';
 import FloatingContact from './components/FloatingContact';
 
+export type AppView = 'home' | 'gallery' | 'teachers';
+
 export default function App() {
+  const [currentView, setCurrentView] = useState<AppView>('home');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   
   // Search input state
   const [searchVal, setSearchVal] = useState('');
+
+  // Handle URL hash changes (e.g. #/gallery, #/teachers, or browser back button)
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#/gallery' || hash === '#gallery-page') {
+        setCurrentView('gallery');
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      } else if (hash === '#/teachers' || hash === '#teachers-page') {
+        setCurrentView('teachers');
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      } else {
+        setCurrentView('home');
+      }
+    };
+
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   // Force Light Mode completely & scroll to top on mount
   useEffect(() => {
@@ -47,20 +71,40 @@ export default function App() {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
+
+  const navigateTo = (view: AppView, sectionId?: string) => {
+    setCurrentView(view);
+    if (view === 'gallery') {
+      window.location.hash = '#/gallery';
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    } else if (view === 'teachers') {
+      window.location.hash = '#/teachers';
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    } else {
+      window.location.hash = sectionId ? `#${sectionId}` : '#home';
+      if (sectionId) {
+        setTimeout(() => {
+          document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+        }, 120);
+      } else {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      }
+    }
+  };
 
   // Search result mapping helper
   const searchItems = [
-    { label: "CBSE Affiliation & Official Accreditation", link: "#cbse" },
-    { label: "Principal Shri Shambhu Sharan Tiwari Message", link: "#principal" },
-    { label: "Academic Glory Class 10 Toppers & School Topper", link: "#glory" },
-    { label: "School Faculty & Teacher Directory", link: "#teachers" },
-    { label: "About Saraswati Vidya Mandir Foundations", link: "#about" },
-    { label: "Beyond Classroom sports, music, drama clubs", link: "#classroom" },
-    { label: "Community Reviews & Write a Review", link: "#reviews" },
-    { label: "Prantiya Sanskriti Mahotsav 5 & 6 Sept Notice", link: "#notices" },
-    { label: "Contact Us & Quick Typeform Enquiry", link: "#contact" }
+    { label: "Photo Gallery - Complete 32 Archival Photos", view: "gallery" as AppView },
+    { label: "Faculty Directory - All Teachers & Staff Members", view: "teachers" as AppView },
+    { label: "CBSE Affiliation & Official Accreditation", link: "cbse" },
+    { label: "Principal Shri Shambhu Sharan Tiwari Message", link: "principal" },
+    { label: "Academic Glory Class 10 Toppers & School Topper", link: "glory" },
+    { label: "About Saraswati Vidya Mandir Foundations", link: "about" },
+    { label: "Beyond Classroom sports, music, drama clubs", link: "classroom" },
+    { label: "Community Reviews & Write a Review", link: "reviews" },
+    { label: "Prantiya Sanskriti Mahotsav 5 & 6 Sept Notice", link: "notices" },
+    { label: "Contact Us & Quick Typeform Enquiry", link: "contact" }
   ];
 
   const filteredSearchResults = searchVal
@@ -73,52 +117,76 @@ export default function App() {
       {/* Premium Loading Animation */}
       <PremiumLoader />
 
-      {/* Floating Glass Navigation Bar */}
+      {/* Floating Glass Navigation Bar with Subpage Routing */}
       <Navbar 
+        currentView={currentView}
+        onNavigate={navigateTo}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
       />
 
-      <main className="relative">
-        {/* Full-screen Premium Hero Section */}
-        <Hero />
+      {/* CONDITIONAL SUBPAGE ROUTING: Dedicated subpages or Main Homepage */}
+      {currentView === 'gallery' ? (
+        <Gallery 
+          isSubpage={true}
+          onBackToHome={() => navigateTo('home', 'gallery')}
+        />
+      ) : currentView === 'teachers' ? (
+        <Teachers 
+          isSubpage={true}
+          onBackToHome={() => navigateTo('home', 'teachers')}
+        />
+      ) : (
+        <main className="relative">
+          {/* Full-screen Premium Hero Section */}
+          <Hero />
 
-        {/* Admission Glowing Infinite Marquee */}
-        <Marquee />
+          {/* Admission Glowing Infinite Marquee */}
+          <Marquee />
 
-        {/* Premium Cute Gallery Carousel */}
-        <Gallery />
+          {/* Restored Every Moment Tells a Story Carousel with Images 24, 25, 26 added */}
+          <StoryCarousel onOpenFullGallery={() => navigateTo('gallery')} />
 
-        {/* About Section - Split Layout & Timeline */}
-        <About />
+          {/* About Section - Split Layout & Timeline */}
+          <About />
 
-        {/* Principal Desk Section with 1:1 animated frame */}
-        <Principal />
+          {/* Principal Desk Section with 1:1 animated frame */}
+          <Principal />
 
-        {/* Our Glory - Special School Topper Card & Class X CBSE Results Auto-Scroll Carousel */}
-        <Glory />
+          {/* Our Glory - Special School Topper Card & Class X CBSE Results Auto-Scroll Carousel */}
+          <Glory />
 
-        {/* Beyond Classroom - Co-curricular Clubs Grid */}
-        <BeyondClassroom />
+          {/* Photo Gallery Tab on Home page (Clicking Open Gallery navigates to dedicated subpage) */}
+          <Gallery 
+            isSubpage={false}
+            onOpenSubpage={() => navigateTo('gallery')}
+          />
 
-        {/* Education System Map */}
-        <EducationSystem />
+          {/* Beyond Classroom - Co-curricular Clubs Grid */}
+          <BeyondClassroom />
 
-        {/* Interactive Notice Board with Sanskrit Mahotsav */}
-        <NoticeBoard />
+          {/* Education System Map */}
+          <EducationSystem />
 
-        {/* Searchable Teacher Faculty Directory with subpage support */}
-        <Teachers />
+          {/* Interactive Notice Board with Sanskrit Mahotsav */}
+          <NoticeBoard />
 
-        {/* CBSE Affiliation Official Accreditation */}
-        <CBSEAffiliation />
+          {/* Searchable Teacher Faculty Tab on Home page (Clicking Open Directory navigates to dedicated subpage) */}
+          <Teachers 
+            isSubpage={false}
+            onOpenSubpage={() => navigateTo('teachers')}
+          />
 
-        {/* Testimonials and Write a Review Center */}
-        <Reviews />
+          {/* CBSE Affiliation Official Accreditation */}
+          <CBSEAffiliation />
 
-        {/* Contact form & Google maps section with Typeform flow */}
-        <Contact />
-      </main>
+          {/* Testimonials and Write a Review Center */}
+          <Reviews />
+
+          {/* Contact form & Google maps section with Typeform flow */}
+          <Contact />
+        </main>
+      )}
 
       {/* Wave Separator Footer */}
       <Footer />
@@ -140,56 +208,59 @@ export default function App() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-5 shadow-2xl relative"
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full border border-slate-200 shadow-2xl relative"
             >
               <button 
                 onClick={() => setIsSearchOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-                id="search-modal-close"
+                className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1"
+                aria-label="Close search"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-2 mb-4">
-                <Search className="h-5 w-5 text-blue-600" />
-                <h3 className="font-display font-bold text-base text-slate-900">
-                  Search SVM Maharajganj Portal
+              <div className="flex items-center gap-2 mb-4 text-blue-600">
+                <Search className="h-5 w-5" />
+                <h3 className="font-display font-black text-xl text-slate-900">
+                  Instant Portal Search
                 </h3>
               </div>
 
-              <input 
-                type="text"
-                autoFocus
-                placeholder="Type query: toppers, faculty, reviews, notices..."
-                value={searchVal}
-                onChange={(e) => setSearchVal(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs md:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-                id="search-modal-input"
-              />
+              <div className="relative mb-6">
+                <input 
+                  type="text" 
+                  value={searchVal}
+                  onChange={(e) => setSearchVal(e.target.value)}
+                  placeholder="Search faculty, gallery, CBSE, toppers, events..."
+                  className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-slate-800"
+                  autoFocus
+                />
+              </div>
 
-              <div className="flex flex-col gap-2 max-h-60 overflow-y-auto no-scrollbar">
-                {filteredSearchResults.length > 0 ? (
-                  filteredSearchResults.map((res, i) => (
-                    <a
-                      key={i}
-                      href={res.link}
-                      onClick={() => setIsSearchOpen(false)}
-                      className="p-3 bg-slate-50 hover:bg-blue-50 rounded-xl text-xs text-slate-700 hover:text-blue-600 transition-colors flex items-center justify-between group"
-                    >
-                      <span className="font-medium">{res.label}</span>
-                      <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all text-blue-600" />
-                    </a>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-400 text-center py-4">No direct matching sections found.</p>
-                )}
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {filteredSearchResults.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setIsSearchOpen(false);
+                      if (item.view) {
+                        navigateTo(item.view);
+                      } else if (item.link) {
+                        navigateTo('home', item.link);
+                      }
+                    }}
+                    className="w-full text-left p-3 rounded-xl hover:bg-blue-50 text-slate-700 text-xs font-semibold flex items-center justify-between group transition-colors cursor-pointer"
+                  >
+                    <span>{item.label}</span>
+                    <ArrowRight className="h-3.5 w-3.5 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                ))}
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* MODAL 2: Live Notifications Modal */}
+      {/* MODAL 2: Live Notifications Center */}
       <AnimatePresence>
         {isNotificationsOpen && (
           <motion.div 
@@ -203,40 +274,53 @@ export default function App() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-5 shadow-2xl relative"
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border border-slate-200 shadow-2xl relative"
             >
               <button 
                 onClick={() => setIsNotificationsOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-                id="notifications-modal-close"
+                className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1"
+                aria-label="Close notifications"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-2 mb-4">
-                <Bell className="h-5 w-5 text-orange-500" />
-                <h3 className="font-display font-bold text-base text-slate-900">
-                  Live School Notices
+              <div className="flex items-center gap-2 mb-4 text-amber-600">
+                <Bell className="h-5 w-5" />
+                <h3 className="font-display font-black text-xl text-slate-900">
+                  Official Notifications
                 </h3>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 shadow-sm">
-                  <div className="flex items-center justify-between text-[10px] text-orange-600 font-bold uppercase tracking-wider mb-1.5">
-                    <span className="flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      Grand Cultural Event
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-200/80 text-orange-800">5 & 6 SEPT</span>
-                  </div>
-                  <h4 className="text-xs md:text-sm font-bold text-slate-900">
-                    🎉 Prantiya Sanskriti Mahotsav 2026
-                  </h4>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                    Honored Chief Guests: <strong>Shri Mithilesh Tiwari</strong> (Education Minister of Bihar), <strong>Shri Janardan Singh Sigriwal</strong> (MP Maharajganj), and <strong>Smt. Anita Sinha</strong> (SDM Maharajganj) alongside Lok Shiksha Samiti members.
-                  </p>
-                </div>
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 mb-4">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-full inline-block mb-1.5">
+                  Featured Event
+                </span>
+                <h4 className="font-display font-bold text-sm text-slate-900">
+                  🎉 Prantiya Sanskriti Mahotsav 2026
+                </h4>
+                <p className="text-xs text-slate-600 mt-1">
+                  Scheduled on <strong>5 & 6 September</strong> with Hon'ble Education Minister Shri Mithilesh Tiwari and MP Shri Janardan Singh Sigriwal.
+                </p>
               </div>
+
+              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 mb-4">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800 bg-blue-200/80 px-2 py-0.5 rounded-full inline-block mb-1.5">
+                  Admissions Open
+                </span>
+                <h4 className="font-display font-bold text-sm text-slate-900">
+                  Nursery to Class X Registrations
+                </h4>
+                <p className="text-xs text-slate-600 mt-1">
+                  Limited seats available. Online enquiry and desk counseling active daily 8:00 AM – 3:00 PM.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsNotificationsOpen(false)}
+                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                Mark as Read
+              </button>
             </motion.div>
           </motion.div>
         )}
