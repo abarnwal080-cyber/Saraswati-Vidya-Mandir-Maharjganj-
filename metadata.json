@@ -1,0 +1,6 @@
+{
+  "name": "Saraswati Vidya Mandir",
+  "description": "A premium, futuristic school website for Saraswati Vidya Mandir with elegant animations, glassmorphism UI, interactive sections, and rich Indian value aesthetics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
