@@ -175,14 +175,26 @@ export default function Footer() {
             </div>
           </div>
 
-          <button
-            onClick={handleScrollToTop}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 border border-slate-800 hover:border-slate-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider cursor-pointer shadow-sm hover:bg-slate-800 transition-all"
-            id="back-to-top-btn"
-          >
-            <span>Back To Top</span>
-            <ChevronUp className="h-4 w-4" />
-          </button>
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Embedded Free Visitor Counter */}
+            <div className="flex items-center rounded-xl bg-slate-900/80 border border-slate-800/80 px-2.5 py-1 shadow-xs">
+              <iframe
+                title="Visitor Counter"
+                srcDoc={`<!DOCTYPE html><html><head><base target="_blank"><style>body{margin:0;padding:0;background:transparent;display:flex;align-items:center;gap:6px;font-family:system-ui,-apple-system,sans-serif;font-size:10px;color:#94a3b8}br{display:none}a{color:#94a3b8;text-decoration:none}a:hover{color:#cbd5e1;text-decoration:underline}img{display:block;height:36px;width:auto;border-radius:4px}</style></head><body><a href="https://www.acadoo.de/">Acadoo</a><script type="text/javascript" src="https://www.freevisitorcounters.com/auth.php?id=032a1f5f7c538a4c8748fab0adfcb8415f3a7d9c"></script><script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1658027/t/1"></script></body></html>`}
+                className="w-44 h-10 border-0 bg-transparent overflow-hidden"
+                scrolling="no"
+              />
+            </div>
+
+            <button
+              onClick={handleScrollToTop}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 border border-slate-800 hover:border-slate-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider cursor-pointer shadow-sm hover:bg-slate-800 transition-all"
+              id="back-to-top-btn"
+            >
+              <span>Back To Top</span>
+              <ChevronUp className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </footer>
